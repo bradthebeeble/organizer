@@ -28,7 +28,9 @@
       "mcp__github__create_branch",
       "Bash(git checkout:*)",
       "mcp__taskmaster-ai__analyze_project_complexity",
-      "Bash(openssl rand:*)"
+      "Bash(openssl rand:*)",
+      "mcp__github__create_pull_request",
+      "mcp__coderabbitai__get_coderabbit_reviews"
     ],
     "deny": []
   }

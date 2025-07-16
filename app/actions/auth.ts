@@ -1,8 +1,9 @@
 "use server"
 
-import { signIn } from "@/auth"
 import { redirect } from "next/navigation"
 import { AuthError } from "next-auth"
+
+import { signIn } from "@/auth"
 
 export async function authenticate(formData: FormData) {
   try {
@@ -16,10 +17,15 @@ export async function authenticate(formData: FormData) {
       switch (error.type) {
         case "CredentialsSignin":
           redirect("/auth/error?error=CredentialsSignin")
+          break
         default:
           redirect("/auth/error?error=Default")
       }
     }
     throw error
   }
+}
+
+export async function signInWithGoogle() {
+  await signIn("google", { redirectTo: "/dashboard" })
 }
