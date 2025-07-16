@@ -27,7 +27,8 @@
       "Bash(git commit:*)",
       "mcp__github__create_branch",
       "Bash(git checkout:*)",
-      "mcp__taskmaster-ai__analyze_project_complexity"
+      "mcp__taskmaster-ai__analyze_project_complexity",
+      "Bash(openssl rand:*)"
     ],
     "deny": []
   }
