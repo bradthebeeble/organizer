@@ -3,6 +3,11 @@ import { router, protectedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import { createOptionalUpdate, createOptionalCreate, createProjectAccessFilter } from '../utils';
 
+type NotificationData = {
+  taskId: string;
+  projectId: string;
+};
+
 export const taskRouter = router({
   // Get tasks for a project
   list: protectedProcedure
@@ -105,10 +110,7 @@ export const taskRouter = router({
           id: input.id,
           deletedAt: null,
           project: {
-            OR: [
-              { ownerId: ctx.session.user.id! },
-              { members: { some: { userId: ctx.session.user.id! } } },
-            ],
+            ...createProjectAccessFilter(ctx.session.user.id!),
             deletedAt: null,
           },
         },
@@ -353,7 +355,7 @@ export const taskRouter = router({
             data: {
               taskId: task.id,
               projectId: input.projectId,
-            },
+            } satisfies NotificationData,
           },
         });
       }
@@ -384,10 +386,7 @@ export const taskRouter = router({
           id: input.id,
           deletedAt: null,
           project: {
-            OR: [
-              { ownerId: ctx.session.user.id! },
-              { members: { some: { userId: ctx.session.user.id! } } },
-            ],
+            ...createProjectAccessFilter(ctx.session.user.id!),
             deletedAt: null,
           },
         },
@@ -443,80 +442,84 @@ export const taskRouter = router({
         updatedAt: new Date(),
       });
 
-      const updatedTask = await ctx.prisma.task.update({
-        where: { id },
-        data: updateData,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          status: true,
-          priority: true,
-          dueDate: true,
-          startDate: true,
-          estimatedHours: true,
-          actualHours: true,
-          updatedAt: true,
-          completedAt: true,
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+      const result = await ctx.prisma.$transaction(async (tx) => {
+        const updatedTask = await tx.task.update({
+          where: { id },
+          data: updateData,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            dueDate: true,
+            startDate: true,
+            estimatedHours: true,
+            actualHours: true,
+            updatedAt: true,
+            completedAt: true,
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
-          },
-          creator: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-
-      // Log activity
-      await ctx.prisma.activity.create({
-        data: {
-          type: 'TASK_UPDATED',
-          description: `Updated task "${updatedTask.title}"`,
-          userId: ctx.session.user.id!,
-          projectId: existingTask.projectId,
-        },
-      });
-
-      // Create notifications
-      if (input.assigneeId && input.assigneeId !== existingTask.assigneeId && input.assigneeId !== ctx.session.user.id!) {
-        await ctx.prisma.notification.create({
-          data: {
-            type: 'TASK_ASSIGNED',
-            title: 'Task assigned to you',
-            message: `You have been assigned to task "${updatedTask.title}"`,
-            userId: input.assigneeId,
-            data: {
-              taskId: updatedTask.id,
-              projectId: existingTask.projectId,
+            creator: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
           },
         });
-      }
 
-      if (input.status === 'COMPLETED' && existingTask.status !== 'COMPLETED') {
-        await ctx.prisma.notification.create({
+        // Log activity
+        await tx.activity.create({
           data: {
-            type: 'TASK_COMPLETED',
-            title: 'Task completed',
-            message: `Task "${updatedTask.title}" has been completed`,
-            userId: existingTask.assigneeId || ctx.session.user.id!,
-            data: {
-              taskId: updatedTask.id,
-              projectId: existingTask.projectId,
-            },
+            type: 'TASK_UPDATED',
+            description: `Updated task "${updatedTask.title}"`,
+            userId: ctx.session.user.id!,
+            projectId: existingTask.projectId,
           },
         });
-      }
 
-      return updatedTask;
+        // Create notifications
+        if (input.assigneeId && input.assigneeId !== existingTask.assigneeId && input.assigneeId !== ctx.session.user.id!) {
+          await tx.notification.create({
+            data: {
+              type: 'TASK_ASSIGNED',
+              title: 'Task assigned to you',
+              message: `You have been assigned to task "${updatedTask.title}"`,
+              userId: input.assigneeId,
+              data: {
+                taskId: updatedTask.id,
+                projectId: existingTask.projectId,
+              } satisfies NotificationData,
+            },
+          });
+        }
+
+        if (input.status === 'COMPLETED' && existingTask.status !== 'COMPLETED') {
+          await tx.notification.create({
+            data: {
+              type: 'TASK_COMPLETED',
+              title: 'Task completed',
+              message: `Task "${updatedTask.title}" has been completed`,
+              userId: existingTask.assigneeId || ctx.session.user.id!,
+              data: {
+                taskId: updatedTask.id,
+                projectId: existingTask.projectId,
+              } satisfies NotificationData,
+            },
+          });
+        }
+
+        return updatedTask;
+      });
+
+      return result;
     }),
 
   // Delete task (soft delete)
@@ -529,10 +532,7 @@ export const taskRouter = router({
           id: input.id,
           deletedAt: null,
           project: {
-            OR: [
-              { ownerId: ctx.session.user.id! },
-              { members: { some: { userId: ctx.session.user.id! } } },
-            ],
+            ...createProjectAccessFilter(ctx.session.user.id!),
             deletedAt: null,
           },
         },

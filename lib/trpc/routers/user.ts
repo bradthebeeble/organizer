@@ -6,8 +6,9 @@ import { createOptionalUpdate, createProjectAccessFilter } from '../utils';
 export const userRouter = router({
   // Get current user profile
   profile: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id!;
     const user = await ctx.prisma.user.findUnique({
-      where: { id: ctx.session.user.id! },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -44,13 +45,14 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id!;
       const updateData = createOptionalUpdate({
         ...input,
         updatedAt: new Date(),
       });
 
       const updatedUser = await ctx.prisma.user.update({
-        where: { id: ctx.session.user.id! },
+        where: { id: userId },
         data: updateData,
         select: {
           id: true,
