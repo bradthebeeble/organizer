@@ -31,7 +31,8 @@
       "Bash(openssl rand:*)",
       "mcp__github__create_pull_request",
       "mcp__coderabbitai__get_coderabbit_reviews",
-      "mcp__taskmaster-ai__update_subtask"
+      "mcp__taskmaster-ai__update_subtask",
+      "mcp__coderabbitai__resolve_comment"
     ],
     "deny": []
   }
