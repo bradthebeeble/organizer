@@ -1,5 +1,6 @@
 import { signIn } from "@/auth"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 export default function SignInPage() {
   return (
@@ -50,7 +51,13 @@ export default function SignInPage() {
                 await signIn("credentials", {
                   email: formData.get("email") as string,
                   password: formData.get("password") as string,
-                  redirectTo: "/dashboard",
+                  redirect: false,
+                }).then((result) => {
+                  if (result?.error) {
+                    redirect("/auth/error?error=CredentialsSignin")
+                  } else {
+                    redirect("/dashboard")
+                  }
                 })
               }}
               className="mt-6 space-y-4"
