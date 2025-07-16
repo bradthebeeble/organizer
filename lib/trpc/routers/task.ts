@@ -288,77 +288,81 @@ export const taskRouter = router({
         }
       }
 
-      const task = await ctx.prisma.task.create({
-        data: createOptionalCreate({
-          title: input.title,
-          description: input.description,
-          projectId: input.projectId,
-          assigneeId: input.assigneeId,
-          parentId: input.parentId,
-          priority: input.priority,
-          dueDate: input.dueDate,
-          startDate: input.startDate,
-          estimatedHours: input.estimatedHours,
-          creatorId: ctx.session.user.id!,
-        }),
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          status: true,
-          priority: true,
-          dueDate: true,
-          startDate: true,
-          estimatedHours: true,
-          createdAt: true,
-          project: {
-            select: {
-              id: true,
-              name: true,
+      const task = await ctx.prisma.$transaction(async (tx) => {
+        const task = await tx.task.create({
+          data: createOptionalCreate({
+            title: input.title,
+            description: input.description,
+            projectId: input.projectId,
+            assigneeId: input.assigneeId,
+            parentId: input.parentId,
+            priority: input.priority,
+            dueDate: input.dueDate,
+            startDate: input.startDate,
+            estimatedHours: input.estimatedHours,
+            creatorId: ctx.session.user.id!,
+          }),
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            dueDate: true,
+            startDate: true,
+            estimatedHours: true,
+            createdAt: true,
+            project: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
-          },
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
-          },
-          creator: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+            creator: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
-          },
-        },
-      });
-
-      // Log activity
-      await ctx.prisma.activity.create({
-        data: {
-          type: 'TASK_CREATED',
-          description: `Created task "${task.title}"`,
-          userId: ctx.session.user.id!,
-          projectId: input.projectId,
-        },
-      });
-
-      // Create notification if task is assigned to someone other than creator
-      if (input.assigneeId && input.assigneeId !== ctx.session.user.id!) {
-        await ctx.prisma.notification.create({
-          data: {
-            type: 'TASK_ASSIGNED',
-            title: 'New task assigned',
-            message: `You have been assigned to task "${task.title}"`,
-            userId: input.assigneeId,
-            data: {
-              taskId: task.id,
-              projectId: input.projectId,
-            } satisfies NotificationData,
           },
         });
-      }
+
+        // Log activity
+        await tx.activity.create({
+          data: {
+            type: 'TASK_CREATED',
+            description: `Created task "${task.title}"`,
+            userId: ctx.session.user.id!,
+            projectId: input.projectId,
+          },
+        });
+
+        // Create notification if task is assigned to someone other than creator
+        if (input.assigneeId && input.assigneeId !== ctx.session.user.id!) {
+          await tx.notification.create({
+            data: {
+              type: 'TASK_ASSIGNED',
+              title: 'New task assigned',
+              message: `You have been assigned to task "${task.title}"`,
+              userId: input.assigneeId,
+              data: {
+                taskId: task.id,
+                projectId: input.projectId,
+              } satisfies NotificationData,
+            },
+          });
+        }
+
+        return task;
+      });
 
       return task;
     }),

@@ -5,7 +5,6 @@ import { ProjectRole } from '@prisma/client';
 
 /**
  * Filters out undefined values from an object for Prisma updates
- * Also converts undefined to null for nullable fields
  */
 export function createOptionalUpdate<T extends Record<string, unknown>>(data: T): Record<string, unknown> {
   return Object.fromEntries(

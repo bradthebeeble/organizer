@@ -1,18 +1,16 @@
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import type { NextRequest } from 'next/server';
 
 /**
  * Context for tRPC procedures
  * Includes the user session and database client
  */
-export const createContext = async (req: NextRequest) => {
+export const createContext = async () => {
   const session = await auth();
   
   return {
     session,
     prisma,
-    req,
   };
 };
 
