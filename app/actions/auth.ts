@@ -1,3 +1,5 @@
+"use server"
+
 import { signIn } from "@/auth"
 import { redirect } from "next/navigation"
 import { AuthError } from "next-auth"
