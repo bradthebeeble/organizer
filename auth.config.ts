@@ -51,19 +51,24 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   session: {
-    strategy: "database", // Use database sessions with Prisma
+    strategy: "jwt", // Use JWT sessions for middleware compatibility
   },
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+      }
+      return session
+    },
   },
 }
