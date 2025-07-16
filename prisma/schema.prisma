@@ -44,9 +44,30 @@ model User {
   accounts      Account[]
   sessions      Session[]
   
+  // Organizer-specific fields
+  displayName   String?
+  bio           String?
+  timezone      String?   @default("UTC")
+  language      String?   @default("en")
+  
+  // Project management relationships
+  projectMemberships ProjectMember[]
+  ownedProjects      Project[]       @relation("ProjectOwner")
+  assignedTasks      Task[]          @relation("TaskAssignee")
+  createdTasks       Task[]          @relation("TaskCreator")
+  teamMemberships    TeamMember[]
+  notes             Note[]
+  reminders         Reminder[]
+  notifications     Notification[]
+  activities        Activity[]
+  
+  // Audit fields
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // Soft delete support
   
+  @@index([email])
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -56,4 +77,439 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Project Management Models
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  COMPLETED
+  ON_HOLD
+}
+
+enum ProjectVisibility {
+  PUBLIC
+  PRIVATE
+  TEAM
+}
+
+enum ProjectRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(ACTIVE)
+  visibility  ProjectVisibility @default(PRIVATE)
+  
+  // Ownership
+  ownerId     String
+  owner       User      @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  // Collaboration
+  members     ProjectMember[]
+  teams       Team[]        @relation("TeamProjects")
+  
+  // Related entities
+  tasks       Task[]
+  notes       Note[]
+  reminders   Reminder[]
+  milestones  Milestone[]
+  categories  Category[]
+  phases      Phase[]
+  activities  Activity[]
+  
+  // Audit fields
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete support
+  
+  @@index([ownerId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  userId    String
+  projectId String
+  role      ProjectRole @default(MEMBER)
+  
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  joinedAt  DateTime    @default(now())
+  
+  @@unique([userId, projectId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+// Task Management Models
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  COMPLETED
+  CANCELLED
+  BLOCKED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Task {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus  @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  
+  // Relationships
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  assigneeId  String?
+  assignee    User?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  
+  creatorId   String
+  creator     User        @relation("TaskCreator", fields: [creatorId], references: [id])
+  
+  // Hierarchical relationships
+  parentId    String?
+  parent      Task?       @relation("TaskHierarchy", fields: [parentId], references: [id])
+  children    Task[]      @relation("TaskHierarchy")
+  
+  // Related entities
+  notes       Note[]
+  reminders   Reminder[]
+  
+  // Scheduling
+  dueDate     DateTime?
+  startDate   DateTime?
+  estimatedHours Int?
+  actualHours    Int?
+  
+  // Audit fields
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?   // Soft delete support
+  completedAt DateTime?
+  
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([creatorId])
+  @@index([parentId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@index([projectId, status])
+  @@index([assigneeId, status])
+  @@map("tasks")
+}
+
+// Supporting Entities
+enum NoteType {
+  PROJECT
+  TASK
+  GENERAL
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String?
+  content   String
+  type      NoteType @default(GENERAL)
+  
+  // Relationships
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  
+  // Audit fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime? // Soft delete support
+  
+  @@index([projectId])
+  @@index([taskId])
+  @@index([authorId])
+  @@index([deletedAt])
+  @@map("notes")
+}
+
+enum ReminderType {
+  TASK_DUE
+  MILESTONE
+  CUSTOM
+  MEETING
+}
+
+model Reminder {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  type        ReminderType @default(CUSTOM)
+  
+  // Timing
+  reminderDate DateTime
+  isRecurring  Boolean     @default(false)
+  recurrenceRule String?   // RRULE format
+  
+  // Relationships
+  projectId   String?
+  project     Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  taskId      String?
+  task        Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  
+  // Status
+  isCompleted Boolean     @default(false)
+  completedAt DateTime?
+  
+  // Audit fields
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?   // Soft delete support
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([reminderDate])
+  @@index([isCompleted])
+  @@index([deletedAt])
+  @@map("reminders")
+}
+
+enum MilestoneStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Milestone {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  status      MilestoneStatus @default(PLANNED)
+  
+  // Timing
+  dueDate     DateTime?
+  completedAt DateTime?
+  
+  // Relationships
+  projectId   String
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Progress tracking
+  progress    Int             @default(0) // 0-100
+  
+  // Audit fields
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?       // Soft delete support
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@map("milestones")
+}
+
+// Organizational Models
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  color       String? // Hex color code
+  
+  // Relationships
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Audit fields
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? // Soft delete support
+  
+  @@index([projectId])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+enum PhaseStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model Phase {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      PhaseStatus @default(PLANNED)
+  
+  // Timing
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  // Relationships
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Ordering
+  order       Int         @default(0)
+  
+  // Audit fields
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?   // Soft delete support
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([deletedAt])
+  @@map("phases")
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  
+  // Relationships
+  members     TeamMember[]
+  projects    Project[]    @relation("TeamProjects")
+  
+  // Audit fields
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?    // Soft delete support
+  
+  @@index([deletedAt])
+  @@map("teams")
+}
+
+enum TeamRole {
+  LEAD
+  MEMBER
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  userId   String
+  teamId   String
+  role     TeamRole @default(MEMBER)
+  
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  joinedAt DateTime @default(now())
+  
+  @@unique([userId, teamId])
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+// Notification and Activity Models
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_COMPLETED
+  TASK_OVERDUE
+  PROJECT_INVITE
+  MILESTONE_REACHED
+  REMINDER
+  SYSTEM
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?            // Additional data for the notification
+  
+  // Relationships
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Status
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  
+  // Audit fields
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?        // Soft delete support
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("notifications")
+}
+
+enum ActivityType {
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_COMPLETED
+  TASK_DELETED
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_DELETED
+  USER_JOINED
+  USER_LEFT
+  MILESTONE_CREATED
+  MILESTONE_COMPLETED
+  NOTE_CREATED
+  NOTE_UPDATED
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  type        ActivityType
+  description String
+  metadata    Json?        // Additional context data
+  
+  // Relationships
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  
+  projectId   String?
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Audit fields
+  createdAt   DateTime     @default(now())
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("activities")
 }
