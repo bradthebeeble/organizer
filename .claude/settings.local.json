@@ -30,7 +30,8 @@
       "mcp__taskmaster-ai__analyze_project_complexity",
       "Bash(openssl rand:*)",
       "mcp__github__create_pull_request",
-      "mcp__coderabbitai__get_coderabbit_reviews"
+      "mcp__coderabbitai__get_coderabbit_reviews",
+      "mcp__taskmaster-ai__update_subtask"
     ],
     "deny": []
   }

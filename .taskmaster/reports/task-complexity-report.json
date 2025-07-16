@@ -1,9 +1,9 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-16T07:55:39.905Z",
+		"generatedAt": "2025-07-16T10:23:00.375Z",
 		"tasksAnalyzed": 1,
 		"totalTasks": 20,
-		"analysisCount": 10,
+		"analysisCount": 11,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
 		"usedResearch": false
@@ -88,6 +88,14 @@
 			"recommendedSubtasks": 8,
 			"expansionPrompt": "Divide external integrations into: OAuth 2.0 framework setup, Jira API integration with REST API v3, Slack Web API integration, webhook system for real-time updates, field mapping and conflict resolution, integration settings UI, error handling and retry mechanisms, and comprehensive testing.",
 			"reasoning": "Very high complexity due to multiple external APIs, OAuth flows, webhook systems, conflict resolution, error handling, and integration management. Requires extensive testing and robust error handling."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Design Core Database Schema",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the database schema design into logical entity groups, focusing on Auth.js integration, core project entities, relationships and constraints, performance optimizations, and validation testing.",
+			"reasoning": "This task involves designing a comprehensive database schema with multiple complex entities, intricate relationships, performance considerations, and Auth.js integration. The scope includes 9+ models with proper relationships, indexes, constraints, and cascade behaviors, requiring careful planning and implementation."
 		}
 	]
 }
