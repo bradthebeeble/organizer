@@ -1,0 +1,325 @@
+<context>
+# Overview  
+Organizer is a project management tool designed for fluid workflow integration. It combines smart design, AI capabilities, and MCP (Model Context Protocol) integrations to create a seamless project management experience. The tool addresses the need for intuitive project organization with collaborative features, intelligent task management, and external system integrations. It targets teams and individuals who need a flexible yet powerful project management solution that adapts to their workflow rather than forcing them into rigid structures.
+
+# Core Features  
+
+## Authentication & User Management
+- Multi-auth support: Google Sign-In (via Auth.js v5) and traditional username/password authentication
+- Complete user flow: registration, login, password recovery, profile management
+- Team and collaboration support with role-based access control
+
+## Projects (Core Unit)
+- Full CRUD + Archive functionality
+- Attributes: name, description, owner (creator), collaborators
+- Project-level permissions and sharing
+- Serves as the container for all other work items
+
+## Project Components
+### Tasks
+- Comprehensive task management with name, description, due date, owner, status
+- Task types: "Waiting for user X", "User Y is waiting for me"
+- Full CRUD operations plus ownership transfer, status updates, type changes
+- Task dependencies and relationships
+
+### Notes
+- Free-form note taking within project context
+- Date tracking and collaborator attribution
+- Rich text support with attachments
+
+### Reminders
+- Simple reminder system with name and due date
+- Integration with notification system
+
+### Milestones
+- Key project checkpoints
+- Progress tracking and visualization
+
+### Categories
+- Flexible categorization system for organizing project items
+- Custom category creation and management
+
+### Phases
+- Timeline-based project phases with start/end dates
+- Phase-based progress tracking and reporting
+
+### Sub-projects
+- Hierarchical project organization
+- Inherit permissions from parent project
+
+## Collaboration Features
+- Real-time collaboration on all project items
+- Team management and invitation system
+- Activity feeds and change tracking
+- Commenting and discussion threads
+
+## Notifications
+- Event-based notifications (due dates, assignments, mentions)
+- In-app notification center
+- External integrations: Google Workspace, Slack, email
+- Customizable notification preferences
+
+## Integrations
+- Jira: sync tasks, import/export projects
+- Confluence: link documentation, embed pages
+- API-first architecture for custom integrations
+- MCP server implementation for AI assistants
+
+## Configuration & Settings
+- Customizable status enums and workflows
+- User preferences and profile management
+- System-wide and project-specific settings
+- Theme and UI customization
+
+# User Experience  
+
+## User Personas
+1. **Project Manager**: Needs overview of multiple projects, team coordination, deadline tracking
+2. **Individual Contributor**: Focuses on assigned tasks, collaboration on specific items
+3. **Team Lead**: Requires delegation tools, progress monitoring, team communication
+4. **External Collaborator**: Limited access to specific projects, simple interface
+
+## Key User Flows
+1. **Project Creation**: Dashboard → New Project → Configure settings → Invite team
+2. **Task Management**: Project view → Create task → Assign → Track progress → Complete
+3. **Collaboration**: Receive notification → Review changes → Comment/Update → Notify others
+4. **Integration Setup**: Settings → Integrations → Authenticate → Configure sync
+
+## UI/UX Considerations
+- Clean, modern interface with minimal cognitive load
+- A collapsable side menu for key features
+- Responsive design for desktop and mobile
+- Keyboard shortcuts for power users
+- Drag-and-drop for organization
+- Real-time updates without page refreshes
+- Accessibility compliance (WCAG 2.1)
+</context>
+<PRD>
+# Technical Architecture  
+
+## System Components
+### Frontend
+- Next.js 15+ with React 19
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Zustand/Redux for state management
+- Real-time updates via WebSockets/Server-Sent Events
+
+### Backend
+- Next.js API routes with tRPC for type-safe APIs
+- Prisma ORM for database management
+- PostgreSQL as primary database
+- Redis for caching and real-time features
+- Background job processing with Bull/BullMQ
+
+### Authentication
+- Auth.js v5 implementation
+- JWT tokens for session management
+- OAuth providers (Google initially)
+- Secure password storage with bcrypt
+
+### MCP Server
+- TypeScript-based MCP server implementation
+- Resource exposure for projects, tasks, notes
+- Tool implementations for CRUD operations
+- WebSocket support for real-time updates
+
+## Data Models
+### Core Entities
+- User (id, email, name, avatar, preferences) ## Also cross-check with Auth.JS definitions for a User and extension mechanism
+- Project (id, name, description, ownerId, settings)
+- Task (id, projectId, title, description, status, type, ownerId, dueDate)
+- Note (id, projectId, content, authorId, createdAt)
+- Reminder (id, projectId, name, dueDate, userId)
+- Milestone (id, projectId, name, date, description)
+- Category (id, projectId, name, color)
+- Phase (id, projectId, name, startDate, endDate)
+- Team (id, name, members[])
+- Notification (id, userId, type, data, read)
+
+### Relationships
+- Many-to-many: Users ↔ Projects (via collaborators)
+- One-to-many: Project → Tasks/Notes/Reminders/etc.
+- Many-to-many: Users ↔ Teams
+- Hierarchical: Projects → Sub-projects
+
+## APIs and Integrations
+### Internal APIs
+- RESTful + GraphQL hybrid approach
+- Real-time subscriptions for live updates
+- Batch operations for performance
+- Rate limiting and quota management
+
+### External Integrations
+- Jira REST API v3 for issue sync
+- Confluence API for documentation
+- Google Workspace APIs (Calendar, Drive)
+- Slack Web API for notifications
+- Webhook system for custom integrations
+
+## Infrastructure Requirements
+### Development
+- Docker containers for all services
+- Docker Compose for orchestration
+- Local PostgreSQL and Redis instances
+- Hot reload development environment
+
+### Production Considerations
+- Horizontal scaling capability
+- CDN for static assets
+- Database connection pooling
+- Queue system for async operations
+- Monitoring and logging infrastructure
+
+# Development Roadmap  
+
+## MVP (Phase 1)
+### Core Foundation
+- User authentication (Google OAuth + email/password)
+- Basic project CRUD operations
+- Simple task management (create, update, delete, assign)
+- Basic UI with project and task views
+- Database schema and ORM setup
+
+### Essential Features
+- Project ownership and basic permissions
+- Task status management
+- Due date tracking
+- Simple in-app notifications
+- Basic search functionality
+
+## Phase 2: Collaboration
+- Team creation and management
+- Project sharing and collaborator invites
+- Comments on tasks and notes
+- Activity feed
+- Real-time updates for shared projects
+- Email notifications
+
+## Phase 3: Organization Tools
+- Categories and tags
+- Milestones
+- Project phases with timelines
+- Sub-projects
+- Advanced filtering and sorting
+- Bulk operations
+
+## Phase 4: Integration Platform
+- MCP server implementation
+- Jira integration (import/export)
+- Confluence linking
+- Slack notifications
+- Webhook system
+- API documentation
+
+## Phase 5: Advanced Features
+- Custom workflows and status configurations
+- Templates for projects and tasks
+- Reporting and analytics
+- Mobile responsive enhancements
+- Keyboard shortcuts and power user features
+- Advanced search with filters
+
+## Future Enhancements
+- Mobile native apps
+- AI-powered task suggestions
+- Time tracking
+- Resource planning
+- Gantt charts and visualizations
+- Custom fields
+- Automation rules
+- Third-party app marketplace
+
+# Logical Dependency Chain
+
+## Foundation Layer (Must be first)
+1. Database setup and Prisma configuration
+2. Authentication system with Auth.js
+3. User model and basic profile management
+4. Core API structure with error handling
+
+## Core Functionality Layer
+1. Project model and CRUD APIs
+2. Basic authorization (project ownership)
+3. Task model linked to projects
+4. Simple UI for project/task management
+5. Basic routing and navigation
+
+## Enhancement Layer (Requires core)
+1. Collaborator system (requires auth + projects)
+2. Notifications (requires users + events)
+3. Real-time updates (requires stable data model)
+4. Categories/tags (requires projects/tasks)
+
+## Integration Layer (Requires enhanced features)
+1. MCP server (requires stable API)
+2. External integrations (requires webhook system)
+3. Advanced permissions (requires teams)
+
+## Polish Layer
+1. UI/UX improvements
+2. Performance optimizations
+3. Advanced features
+4. Mobile optimization
+
+# Risks and Mitigations  
+
+## Technical Challenges
+### Real-time Synchronization
+- Risk: Complex state management with multiple users
+- Mitigation: Start with polling, migrate to WebSockets gradually
+
+### Integration Complexity
+- Risk: Third-party API changes and rate limits
+- Mitigation: Abstract integration layer, implement caching, graceful degradation
+
+### Performance at Scale
+- Risk: Database queries becoming slow with large datasets
+- Mitigation: Implement pagination early, optimize queries, add caching layer
+
+## MVP Scoping
+### Feature Creep
+- Risk: Trying to build too much in MVP
+- Mitigation: Strict feature prioritization, iterative releases
+
+### User Adoption
+- Risk: MVP too basic to be useful
+- Mitigation: Focus on core workflow completion, gather early user feedback
+
+## Resource Constraints
+### Development Time
+- Risk: Underestimating complexity
+- Mitigation: Modular architecture, reusable components, leverage existing libraries
+
+### Technical Debt
+- Risk: Shortcuts in MVP becoming permanent
+- Mitigation: Document compromises, plan refactoring sprints
+
+# Appendix  
+
+## Technology Choices Rationale
+- Next.js: Full-stack framework with great DX and performance
+- Prisma: Type-safe ORM with excellent migrations
+- Auth.js v5: Modern auth solution with multiple providers
+- PostgreSQL: Reliable, feature-rich relational database
+- TypeScript: Type safety reduces bugs, improves maintainability
+
+## MCP Server Architecture
+- Based on TypeScript SDK from modelcontextprotocol
+- Exposes resources: projects, tasks, notes as browseable items
+- Implements tools for CRUD operations
+- Supports real-time subscriptions for live updates
+
+## Integration Specifications
+### Jira Integration
+- OAuth 2.0 authentication
+- Bi-directional sync for issues/tasks
+- Field mapping configuration
+- Conflict resolution strategies
+
+### Slack Integration
+- OAuth 2.0 with bot permissions
+- Channel selection for notifications
+- Rich message formatting
+- Interactive components for quick actions
+</PRD>
