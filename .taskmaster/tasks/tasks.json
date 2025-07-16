@@ -1,0 +1,334 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Next.js Project with TypeScript",
+        "description": "Set up the foundational Next.js 15+ project with TypeScript, essential dependencies, and development tooling",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "Create new Next.js 15+ project with TypeScript using `npx create-next-app@latest organizer --typescript --tailwind --eslint --app`. Install core dependencies: @types/node, @types/react, @types/react-dom. Configure tsconfig.json with strict mode. Set up ESLint with TypeScript rules and Prettier for code formatting. Initialize package.json scripts for dev, build, lint, and type-check.",
+        "testStrategy": "Verify project builds successfully with `npm run build`, TypeScript compilation passes with `npm run type-check`, and development server starts without errors",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Next.js 15+ project with create-next-app",
+            "description": "Initialize new Next.js project using latest version with TypeScript, Tailwind CSS, ESLint, and App Router",
+            "status": "done",
+            "dependencies": [],
+            "details": "Run `npx create-next-app@latest organizer --typescript --tailwind --eslint --app` to create the project foundation",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Install essential TypeScript dependencies",
+            "description": "Add required TypeScript type definitions and core dependencies",
+            "status": "done",
+            "dependencies": [],
+            "details": "Install @types/node, @types/react, @types/react-dom and other essential TypeScript packages",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Configure TypeScript with strict mode",
+            "description": "Set up tsconfig.json with strict TypeScript configuration",
+            "status": "done",
+            "dependencies": [],
+            "details": "Enable strict mode, configure path mappings, and set up proper TypeScript compilation options",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Set up ESLint with TypeScript rules",
+            "description": "Configure ESLint for TypeScript code quality and consistency",
+            "status": "done",
+            "dependencies": [],
+            "details": "Install and configure ESLint TypeScript plugins, set up rules for React and Next.js",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Configure Prettier for code formatting",
+            "description": "Set up Prettier for consistent code formatting across the project",
+            "status": "done",
+            "dependencies": [],
+            "details": "Install Prettier, configure formatting rules, and integrate with ESLint",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Initialize package.json scripts",
+            "description": "Set up development and build scripts in package.json",
+            "status": "done",
+            "dependencies": [],
+            "details": "Configure scripts for dev, build, lint, type-check, and other common development tasks",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Verify project setup and build",
+            "description": "Test that all configuration works correctly and project builds successfully",
+            "status": "done",
+            "dependencies": [],
+            "details": "Run build, type-check, and development server to ensure everything is working properly",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Configure Database with Prisma and PostgreSQL",
+        "description": "Set up PostgreSQL database with Prisma ORM, including schema initialization and connection configuration",
+        "details": "Install Prisma CLI and client: `npm install prisma @prisma/client`. Initialize Prisma with `npx prisma init`. Configure DATABASE_URL in .env for PostgreSQL connection. Create docker-compose.yml for local PostgreSQL container. Set up initial Prisma schema with User model matching Auth.js requirements. Configure Prisma client generation and database connection pooling.",
+        "testStrategy": "Test database connection with `npx prisma db push`, verify Prisma client generation, and confirm Docker PostgreSQL container starts successfully",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Authentication System with Auth.js v5",
+        "description": "Set up complete authentication system using Auth.js v5 with Google OAuth and email/password support",
+        "details": "Install Auth.js v5: `npm install next-auth@beta @auth/prisma-adapter`. Configure auth.config.ts with Google OAuth provider and credentials provider. Set up Prisma adapter for session storage. Create auth API routes in app/api/auth/[...nextauth]/route.ts. Implement middleware for route protection. Configure environment variables for Google OAuth (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET). Set up session management with JWT tokens.",
+        "testStrategy": "Test Google OAuth flow, email/password registration/login, session persistence, and route protection middleware",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Design Core Database Schema",
+        "description": "Create comprehensive Prisma schema for all core entities with proper relationships and constraints",
+        "details": "Define Prisma models for User (extending Auth.js schema), Project, Task, Note, Reminder, Milestone, Category, Phase, Team, and Notification. Implement proper relationships: User-Project many-to-many via collaborators, Project one-to-many with tasks/notes/etc. Add proper indexes for performance. Include audit fields (createdAt, updatedAt) and soft delete support. Configure cascade deletes and referential integrity constraints.",
+        "testStrategy": "Run `npx prisma generate` and `npx prisma db push` successfully, verify all relationships work correctly, and test constraint validations",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Set up tRPC API Layer",
+        "description": "Implement type-safe API layer using tRPC for client-server communication with proper error handling",
+        "details": "Install tRPC: `npm install @trpc/server @trpc/client @trpc/react-query @trpc/next @tanstack/react-query`. Create tRPC router structure with context including user session and Prisma client. Set up API routes in app/api/trpc/[trpc]/route.ts. Implement error handling middleware with proper error codes. Create tRPC client configuration with React Query integration. Set up TypeScript types for end-to-end type safety.",
+        "testStrategy": "Test tRPC router initialization, verify type safety across client-server boundary, and confirm error handling works correctly",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Create Project CRUD Operations",
+        "description": "Implement complete CRUD operations for projects including creation, reading, updating, deletion, and archiving",
+        "details": "Create tRPC procedures for: createProject, getProject, updateProject, deleteProject, archiveProject, and listProjects. Implement proper authorization checks ensuring only owners can modify projects. Add pagination for project listings. Include validation using Zod schemas for input validation. Implement optimistic updates for better UX. Add support for project settings and metadata.",
+        "testStrategy": "Test all CRUD operations with various user roles, verify authorization works correctly, and confirm data validation prevents invalid inputs",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Build Basic UI Layout and Navigation",
+        "description": "Create the foundational UI structure with navigation, layout components, and routing using Next.js App Router",
+        "details": "Create app layout with collapsible sidebar navigation using Tailwind CSS. Implement responsive design for desktop and mobile. Set up Next.js App Router with nested layouts. Create reusable components: Header, Sidebar, MainContent, and navigation components. Implement dark/light theme support. Add loading states and error boundaries. Use Tailwind CSS for consistent styling and responsive design.",
+        "testStrategy": "Test responsive behavior across different screen sizes, verify navigation works correctly, and confirm theme switching functions properly",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Task Management System",
+        "description": "Create comprehensive task management with CRUD operations, status tracking, and assignment features",
+        "details": "Create tRPC procedures for task operations: createTask, updateTask, deleteTask, assignTask, and updateTaskStatus. Implement task types ('Waiting for user X', 'User Y is waiting for me'). Add support for due dates, descriptions, and priorities. Create task status enum (pending, in-progress, completed, blocked). Implement task ownership transfer and dependency tracking. Add bulk operations for efficiency.",
+        "testStrategy": "Test task creation, assignment, status updates, and bulk operations. Verify task types work correctly and dependencies are properly tracked",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Create Project and Task UI Components",
+        "description": "Build user interfaces for project and task management with intuitive UX and real-time updates",
+        "details": "Create React components for project dashboard, task lists, task cards, and task details. Implement drag-and-drop functionality for task organization. Add inline editing for quick updates. Create modal dialogs for task creation and editing. Implement filtering and sorting options. Add keyboard shortcuts for power users. Use React Query for data fetching and caching.",
+        "testStrategy": "Test all UI interactions, verify drag-and-drop works correctly, confirm inline editing saves properly, and validate keyboard shortcuts",
+        "priority": "medium",
+        "dependencies": [
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Set up State Management with Zustand",
+        "description": "Implement client-side state management for UI state, user preferences, and optimistic updates",
+        "details": "Install Zustand: `npm install zustand`. Create stores for: user preferences, UI state (sidebar collapsed, theme), and temporary state. Implement optimistic updates for better UX. Add persistence for user preferences using localStorage. Create typed store interfaces. Implement middleware for development debugging and state persistence.",
+        "testStrategy": "Test state persistence across page refreshes, verify optimistic updates work correctly, and confirm store performance with large datasets",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Team Management and Collaboration",
+        "description": "Create team creation, member management, and project collaboration features with role-based access control",
+        "details": "Create Team model with many-to-many User relationships. Implement tRPC procedures for team operations: createTeam, addMember, removeMember, updateRoles. Add role-based permissions (owner, admin, member, viewer). Create invitation system with email notifications. Implement project sharing with team members. Add collaboration audit trail for tracking changes.",
+        "testStrategy": "Test team creation, member management, role assignments, and permission enforcement across different user roles",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Build Notes and Reminders System",
+        "description": "Create note-taking and reminder functionality within project contexts with rich text support",
+        "details": "Implement Note model with rich text content support. Create tRPC procedures for note CRUD operations. Add reminder system with due date notifications. Implement rich text editor using Tiptap or similar. Add support for file attachments and mentions. Create search functionality for notes. Implement note sharing and collaboration features.",
+        "testStrategy": "Test note creation, rich text editing, file attachments, reminder notifications, and search functionality",
+        "priority": "medium",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Set up Real-time Updates with WebSockets",
+        "description": "Implement real-time synchronization for collaborative features using WebSockets or Server-Sent Events",
+        "details": "Install WebSocket libraries: `npm install ws @types/ws`. Create WebSocket server using Next.js API routes. Implement real-time subscriptions for project updates, task changes, and new comments. Add connection management and reconnection logic. Create client-side hooks for real-time data. Implement conflict resolution for concurrent edits.",
+        "testStrategy": "Test real-time updates across multiple browser sessions, verify connection stability, and confirm conflict resolution works correctly",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Create Notification System",
+        "description": "Build comprehensive notification system with in-app notifications, email alerts, and preference management",
+        "details": "Create Notification model with type, data, and read status. Implement notification triggers for task assignments, due dates, mentions, and project updates. Set up email notifications using Nodemailer or similar. Create in-app notification center with real-time updates. Implement notification preferences and settings. Add notification batching to prevent spam.",
+        "testStrategy": "Test notification triggers, email delivery, in-app notification display, and preference management functionality",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement Categories and Milestones",
+        "description": "Create flexible categorization system and milestone tracking for project organization",
+        "details": "Create Category and Milestone models with project relationships. Implement color-coded categories for tasks and notes. Add milestone tracking with progress visualization. Create category management UI with drag-and-drop organization. Implement milestone timeline views. Add filtering and grouping by categories and milestones.",
+        "testStrategy": "Test category creation, color assignments, milestone tracking, progress visualization, and filtering functionality",
+        "priority": "medium",
+        "dependencies": [
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Build Phase Management System",
+        "description": "Create project phases with timeline tracking, progress monitoring, and phase-based reporting",
+        "details": "Create Phase model with start/end dates and project relationship. Implement phase-based task organization. Add timeline visualization for project phases. Create phase progress tracking and reporting. Implement phase dependencies and scheduling. Add Gantt chart-like view for phase management.",
+        "testStrategy": "Test phase creation, timeline visualization, progress tracking, and phase dependency management",
+        "priority": "medium",
+        "dependencies": [
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Implement MCP Server",
+        "description": "Create MCP server implementation for AI assistant integration with resource exposure and tool implementations",
+        "details": "Install MCP TypeScript SDK: `npm install @modelcontextprotocol/sdk-typescript`. Create MCP server with resource exposure for projects, tasks, and notes. Implement tools for CRUD operations accessible to AI assistants. Add WebSocket support for real-time MCP updates. Create proper authentication and authorization for MCP access. Document MCP API endpoints and capabilities.",
+        "testStrategy": "Test MCP server startup, resource exposure, tool implementations, and WebSocket connectivity with AI assistants",
+        "priority": "medium",
+        "dependencies": [
+          16
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Set up Redis Caching Layer",
+        "description": "Implement Redis for caching, session storage, and real-time features optimization",
+        "details": "Install Redis client: `npm install redis @types/redis`. Set up Redis Docker container in docker-compose.yml. Implement caching layer for frequently accessed data. Add Redis-based session storage. Create cache invalidation strategies. Implement Redis pub/sub for real-time features. Add cache warming and monitoring.",
+        "testStrategy": "Test Redis connection, cache hit/miss ratios, session persistence, and pub/sub functionality",
+        "priority": "medium",
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Create Search and Filtering System",
+        "description": "Implement comprehensive search functionality across projects, tasks, and notes with advanced filtering options",
+        "details": "Implement full-text search using PostgreSQL full-text search capabilities. Create search API endpoints with pagination. Add advanced filtering by status, assignee, due date, and categories. Implement search result highlighting. Create saved search functionality. Add search analytics and suggestions. Optimize search performance with proper indexing.",
+        "testStrategy": "Test search accuracy, filtering combinations, search performance with large datasets, and saved search functionality",
+        "priority": "low",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Implement External Integrations (Jira/Slack)",
+        "description": "Create integration framework with Jira and Slack for task synchronization and notifications",
+        "details": "Create integration framework with OAuth 2.0 support. Implement Jira API integration for issue sync using Jira REST API v3. Add Slack Web API integration for notifications. Create webhook system for real-time updates. Implement field mapping and conflict resolution. Add integration settings and management UI. Create error handling and retry mechanisms for API failures.",
+        "testStrategy": "Test OAuth flows, Jira issue sync, Slack notification delivery, webhook processing, and error handling for API failures",
+        "priority": "low",
+        "dependencies": [
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-16T06:54:58.946Z",
+      "updated": "2025-07-16T07:31:55.672Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

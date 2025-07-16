@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(rm:*)",
+      "Bash(git push:*)",
+      "mcp__taskmaster-ai__get_tasks",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "mcp__taskmaster-ai__set_task_status",
+      "mcp__taskmaster-ai__update_task",
+      "Bash(npx create-next-app:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(true)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(sudo chown:*)",
+      "mcp__taskmaster-ai__research",
+      "Bash(pkill:*)"
+    ],
+    "deny": []
+  }
+}
