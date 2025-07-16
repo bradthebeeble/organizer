@@ -7,7 +7,6 @@ type NotificationData = {
   taskId: string;
   projectId: string;
 };
-
 export const taskRouter = router({
   // Get tasks for a project
   list: protectedProcedure
@@ -363,7 +362,6 @@ export const taskRouter = router({
 
         return task;
       });
-
       return task;
     }),
 
