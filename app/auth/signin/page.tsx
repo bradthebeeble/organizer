@@ -1,6 +1,6 @@
 import { signIn } from "@/auth"
 import Link from "next/link"
-import { redirect } from "next/navigation"
+import { authenticate } from "@/app/actions/auth"
 
 export default function SignInPage() {
   return (
@@ -45,23 +45,7 @@ export default function SignInPage() {
               </div>
             </div>
             
-            <form
-              action={async (formData: FormData) => {
-                "use server"
-                await signIn("credentials", {
-                  email: formData.get("email") as string,
-                  password: formData.get("password") as string,
-                  redirect: false,
-                }).then((result) => {
-                  if (result?.error) {
-                    redirect("/auth/error?error=CredentialsSignin")
-                  } else {
-                    redirect("/dashboard")
-                  }
-                })
-              }}
-              className="mt-6 space-y-4"
-            >
+            <form action={authenticate} className="mt-6 space-y-4">
               <div>
                 <label htmlFor="email" className="sr-only">
                   Email address
