@@ -24,7 +24,10 @@
       "Bash(npx prisma:*)",
       "Bash(docker-compose up:*)",
       "Bash(docker-compose:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "mcp__github__create_branch",
+      "Bash(git checkout:*)",
+      "mcp__taskmaster-ai__analyze_project_complexity"
     ],
     "deny": []
   }
