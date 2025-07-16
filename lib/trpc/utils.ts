@@ -1,10 +1,10 @@
 /**
  * Utility functions for tRPC procedures
  */
+import { ProjectRole } from '@prisma/client';
 
 /**
  * Filters out undefined values from an object for Prisma updates
- * Also converts undefined to null for nullable fields
  */
 export function createOptionalUpdate<T extends Record<string, unknown>>(data: T): Record<string, unknown> {
   return Object.fromEntries(
@@ -37,6 +37,18 @@ export function createProjectAccessFilter(userId: string) {
     OR: [
       { ownerId: userId },
       { members: { some: { userId } } },
+    ],
+  };
+}
+
+/**
+ * Creates an OR filter for project admin access (owner or admin/owner role member)
+ */
+export function createProjectAdminFilter(userId: string) {
+  return {
+    OR: [
+      { ownerId: userId },
+      { members: { some: { userId, role: { in: [ProjectRole.ADMIN, ProjectRole.OWNER] } } } },
     ],
   };
 }

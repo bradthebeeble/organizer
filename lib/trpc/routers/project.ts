@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
-import { createOptionalUpdate, createOptionalCreate, createProjectAccessFilter } from '../utils';
+import { createOptionalUpdate, createOptionalCreate, createProjectAccessFilter, createProjectAdminFilter } from '../utils';
 
 export const projectRouter = router({
   // Get all projects for current user
@@ -13,7 +13,7 @@ export const projectRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id!!;
+      const userId = ctx.session.user.id!;
       const whereClause = {
         ...createProjectAccessFilter(userId),
         deletedAt: null,
@@ -73,7 +73,7 @@ export const projectRouter = router({
       const project = await ctx.prisma.project.findFirst({
         where: {
           id: input.id,
-          ...createProjectAccessFilter(ctx.session.user.id!!),
+          ...createProjectAccessFilter(ctx.session.user.id!),
           deletedAt: null,
         },
         select: {
@@ -212,10 +212,7 @@ export const projectRouter = router({
       const existingProject = await ctx.prisma.project.findFirst({
         where: {
           id: input.id,
-          OR: [
-            { ownerId: ctx.session.user.id! },
-            { members: { some: { userId: ctx.session.user.id!, role: { in: ['ADMIN', 'OWNER'] } } } },
-          ],
+          ...createProjectAdminFilter(ctx.session.user.id!),
           deletedAt: null,
         },
       });
@@ -321,10 +318,7 @@ export const projectRouter = router({
       const project = await ctx.prisma.project.findFirst({
         where: {
           id: input.projectId,
-          OR: [
-            { ownerId: ctx.session.user.id! },
-            { members: { some: { userId: ctx.session.user.id!, role: { in: ['ADMIN', 'OWNER'] } } } },
-          ],
+          ...createProjectAdminFilter(ctx.session.user.id!),
           deletedAt: null,
         },
       });
@@ -392,10 +386,7 @@ export const projectRouter = router({
       const project = await ctx.prisma.project.findFirst({
         where: {
           id: input.projectId,
-          OR: [
-            { ownerId: ctx.session.user.id! },
-            { members: { some: { userId: ctx.session.user.id!, role: { in: ['ADMIN', 'OWNER'] } } } },
-          ],
+          ...createProjectAdminFilter(ctx.session.user.id!),
           deletedAt: null,
         },
       });

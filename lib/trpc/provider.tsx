@@ -24,8 +24,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
             retry: (failureCount, error) => {
               // Don't retry on 4xx errors
               if (error instanceof Error && 'status' in error) {
-                const status = error.status as number;
-                if (status >= 400 && status < 500) {
+                const status = Number(error.status);
+                if (!isNaN(status) && status >= 400 && status < 500) {
                   return false;
                 }
               }

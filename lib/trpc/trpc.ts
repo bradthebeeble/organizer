@@ -1,5 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
+import { ZodError } from 'zod';
 import type { Context } from './context';
 import { mapPrismaError, BusinessLogicError, mapBusinessLogicError } from './errors';
 
@@ -14,8 +15,8 @@ const t = initTRPC.context<Context>().create({
       data: {
         ...shape.data,
         zodError:
-          error.cause instanceof Error && error.cause.name === 'ZodError'
-            ? (error.cause as { flatten: () => unknown }).flatten()
+          error.cause instanceof ZodError
+            ? error.cause.flatten()
             : null,
       },
     };
@@ -46,27 +47,13 @@ const errorMiddleware = middleware(async ({ next }) => {
   try {
     return await next();
   } catch (error) {
-    // Handle Prisma errors
-    if (error instanceof Error && error.name.includes('Prisma')) {
-      throw mapPrismaError(error);
-    }
-    
     // Handle business logic errors
     if (error instanceof BusinessLogicError) {
       throw mapBusinessLogicError(error);
     }
     
-    // Re-throw tRPC errors as-is
-    if (error instanceof TRPCError) {
-      throw error;
-    }
-    
-    // For any other error, throw generic internal server error
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred',
-      cause: error,
-    });
+    // Always attempt to map Prisma errors - the function handles non-Prisma errors gracefully
+    throw mapPrismaError(error);
   }
 });
 
