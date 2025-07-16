@@ -18,7 +18,13 @@
       "Bash(mv:*)",
       "Bash(sudo chown:*)",
       "mcp__taskmaster-ai__research",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "mcp__taskmaster-ai__next_task",
+      "mcp__taskmaster-ai__get_task",
+      "Bash(npx prisma:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
