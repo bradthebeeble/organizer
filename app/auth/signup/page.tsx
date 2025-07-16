@@ -4,11 +4,12 @@ import { redirect } from "next/navigation"
 import bcrypt from "bcryptjs"
 import Link from "next/link"
 
-export default function SignUpPage({
+export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
   const handleSignUp = async (formData: FormData) => {
     "use server"
     
@@ -70,12 +71,12 @@ export default function SignUpPage({
               sign in to your existing account
             </Link>
           </p>
-          {searchParams.error && (
+          {params.error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-600 text-center">
-                {searchParams.error === "user-exists" && "An account with this email already exists."}
-                {searchParams.error === "missing-fields" && "Please fill in all required fields."}
-                {searchParams.error === "signup-failed" && "Account creation failed. Please try again."}
+                {params.error === "user-exists" && "An account with this email already exists."}
+                {params.error === "missing-fields" && "Please fill in all required fields."}
+                {params.error === "signup-failed" && "Account creation failed. Please try again."}
               </p>
             </div>
           )}
