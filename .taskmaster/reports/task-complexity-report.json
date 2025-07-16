@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-16T07:55:39.905Z",
+		"tasksAnalyzed": 1,
+		"totalTasks": 20,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 3,
+			"taskTitle": "Implement Authentication System with Auth.js v5",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the authentication system implementation into: Auth.js v5 installation and configuration, Google OAuth provider setup, credentials provider configuration, Prisma adapter integration, API routes creation, middleware implementation, and environment variable setup with testing.",
+			"reasoning": "High complexity due to multiple authentication providers, session management, route protection, and external OAuth integration. Requires careful security considerations and extensive testing."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Implement Task Management System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Divide task management into: tRPC procedure creation for CRUD operations, task type implementation, status tracking system, assignment features, dependency tracking, and bulk operations with comprehensive testing.",
+			"reasoning": "Moderate-high complexity with extensive CRUD operations, multiple task types, status management, and dependency tracking. Core business logic requires thorough testing."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Set up State Management with Zustand",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down state management into: Zustand installation and store setup, user preferences store creation, UI state management, optimistic updates implementation, and persistence layer with localStorage.",
+			"reasoning": "Medium complexity with multiple stores, persistence, and optimistic updates. Well-defined scope with clear implementation patterns."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Implement Team Management and Collaboration",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Divide team management into: Team model creation, member management procedures, role-based permissions system, invitation system with email notifications, project sharing features, and collaboration audit trail.",
+			"reasoning": "High complexity due to role-based access control, invitation system, email notifications, and audit trail. Requires careful permission management and security considerations."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Set up Real-time Updates with WebSockets",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down real-time updates into: WebSocket server setup, subscription system for various entities, connection management and reconnection logic, client-side hooks, conflict resolution, and comprehensive testing across multiple sessions.",
+			"reasoning": "High complexity due to real-time synchronization, connection management, conflict resolution, and concurrent editing challenges. Requires extensive testing and error handling."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Implement Categories and Milestones",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide categories and milestones into: Category and Milestone model creation, color-coded category system, milestone tracking with progress visualization, drag-and-drop organization UI, and filtering/grouping functionality.",
+			"reasoning": "Medium-high complexity with UI components, progress visualization, drag-and-drop functionality, and filtering systems. Requires good UX design and data modeling."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Implement MCP Server",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down MCP server into: MCP SDK installation and server creation, resource exposure for projects/tasks/notes, CRUD tool implementations, WebSocket support for real-time updates, and authentication/authorization setup.",
+			"reasoning": "Medium-high complexity with specialized MCP protocol implementation, resource exposure, WebSocket integration, and proper authentication. Requires understanding of MCP standards."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Set up Redis Caching Layer",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide Redis setup into: Redis client installation and Docker container setup, caching layer implementation for frequently accessed data, session storage configuration, pub/sub system for real-time features, and cache invalidation strategies.",
+			"reasoning": "Medium complexity with caching strategies, session management, pub/sub implementation, and cache invalidation. Well-established patterns with clear implementation steps."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Create Search and Filtering System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down search system into: PostgreSQL full-text search implementation, search API endpoints with pagination, advanced filtering system, search result highlighting, saved search functionality, and search performance optimization.",
+			"reasoning": "High complexity due to full-text search implementation, advanced filtering, result highlighting, saved searches, and performance optimization. Requires database optimization and complex query logic."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Implement External Integrations (Jira/Slack)",
+			"complexityScore": 9,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Divide external integrations into: OAuth 2.0 framework setup, Jira API integration with REST API v3, Slack Web API integration, webhook system for real-time updates, field mapping and conflict resolution, integration settings UI, error handling and retry mechanisms, and comprehensive testing.",
+			"reasoning": "Very high complexity due to multiple external APIs, OAuth flows, webhook systems, conflict resolution, error handling, and integration management. Requires extensive testing and robust error handling."
+		}
+	]
+}
